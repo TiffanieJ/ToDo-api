@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.get('/', function (req,res) {
 	res.send('ToDo APT Root');
 });
-
+// GET /todos
 app.get('/todos', function (req, res) {
 	res.json(todos); //<-- like strigify
 });
@@ -51,6 +51,20 @@ app.post('/todos', function (req,res) {
 	res.json(body);
 	todosNextId += 1;
 
+});
+
+// DELETE /todos/:id
+
+app.delete('/todos/:id', function (req,res) {
+	var todoID = parseInt(req.params.id, 10);
+	var matchedToDo = _.findWhere(todos, {id: todoID});
+	
+	if (!matchedToDo) {
+		 res.status(404).send("no todo found");
+	} else {
+		todos = _.without(todos, matchedToDo);
+		res.json(matchedToDo);
+	}
 });
 
 app.listen(PORT, function () {
