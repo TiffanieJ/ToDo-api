@@ -13,12 +13,13 @@ app.use(bodyParser.json());
 app.get('/', function (req,res) {
 	res.send('ToDo APT Root');
 });
-// GET /todos?completed=true
+// GET /todos?completed=true&q=house
+//  (?foo=true) <-- query param ==foo
 app.get('/todos', function (req, res) {
-	var queryParms = req.query;
-	var filteredTodos = todos;
+	var queryParms = req.query; //<-- creates query param (?param)
+	var filteredTodos = todos; // <-- array
 
-	//Searches through query paramaters and return obj with requested comleted value
+	//Searches through query paramaters and return obj with requested comlpeted value
 	if (queryParms.hasOwnProperty('completed') && queryParms.completed 
 	 	 === 'true') {
 	 	 filteredTodos = _.where(filteredTodos, {completed:true});
@@ -26,6 +27,16 @@ app.get('/todos', function (req, res) {
 	  === 'false') {
 	 	 filteredTodos = _.where(filteredTodos, {completed:false});
 	}
+
+	//Searches through query paramaters and return obj with requested completed value
+	if (queryParms.hasOwnProperty('q') && queryParms.q.length > 0)
+	 {
+	 	 filteredTodos = _.filter(filteredTodos, function (todo) { 
+	 	 	return todo.description.toLowerCase().indexOf(queryParms.q.toLowerCase()) > -1;
+	 	 });
+	} 
+
+
 	res.json(filteredTodos); 
 });
 
