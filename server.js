@@ -6,27 +6,32 @@ var app = express();
 var PORT = process.env.PORT || 3000;
 var todos = [];
 todosNextId = 1;
+console.log('hi');
 
 app.use(bodyParser.json());
 
 app.get('/', function (req,res) {
 	res.send('ToDo APT Root');
 });
-// GET /todos
+// GET /todos?completed=true
 app.get('/todos', function (req, res) {
-	res.json(todos); //<-- like strigify
+	var queryParms = req.query;
+	var filteredTodos = todos;
+
+	//Searches through query paramaters and return obj with requested comleted value
+	if (queryParms.hasOwnProperty('completed') && queryParms.completed 
+	 	 === 'true') {
+	 	 filteredTodos = _.where(filteredTodos, {completed:true});
+	} else if (queryParms.hasOwnProperty('completed') && queryParms.completed 
+	  === 'false') {
+	 	 filteredTodos = _.where(filteredTodos, {completed:false});
+	}
+	res.json(filteredTodos); 
 });
 
 app.get('/todos/:id', function (req, res) {
 	todoID = parseInt(req.params.id, 10);
 	var matchedToDo = _.findWhere(todos, {id: todoID});
-	
-	/* var matchedToDo; <-- REPLACED WITH _.findWhere
-	// todos.forEach(function (todo) {
-	// 	if (todoID === todo.id) {
-	// 	matchedToDo = todo;	
-	// 	}
-	}); */ 
 
 	if (matchedToDo) {
 		res.json(matchedToDo);
@@ -56,7 +61,7 @@ app.post('/todos', function (req,res) {
 // DELETE /todos/:id
 
 app.delete('/todos/:id', function (req,res) {
-	var todoID = parseInt(req.params.id, 10);
+	var todoID = parseInt(req.params.id, 10); // req.params stores url paramaters
 	var matchedToDo = _.findWhere(todos, {id: todoID});
 	
 	if (!matchedToDo) {
